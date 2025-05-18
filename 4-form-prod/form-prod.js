@@ -1,6 +1,43 @@
 let ids = []
 let valorTotal = 0
-let numero = 0
+
+
+
+function restar(boton) {
+    let tarjeta = boton.closest('.tarjeta');
+    let seccionBotonOrdenar = boton.closest('.seccionBotonOrdenar');
+    let botonOrdenar = seccionBotonOrdenar.querySelector('#botonOrdenar');
+
+    let padre = boton.parentElement;
+    let parrafo = padre.querySelector('p'); // <p> con el número
+    let numero = parseInt(parrafo.textContent, 10);
+    let accion = "restar";
+
+    if (numero <= 1) {
+        // Quita contador y muestra botón "Ordenar"
+        padre.remove();
+        parrafo.textContent = 0;
+        botonOrdenar.style.display = "block";
+    } else {
+        numero--;
+        parrafo.textContent = numero;
+    }
+
+    crearFactura(tarjeta, numero, accion);
+}
+
+function sumar(boton) {
+    let tarjeta = boton.closest('.tarjeta');
+    let padre = boton.parentElement;
+    let parrafo = padre.querySelector('p');
+    let numero = parseInt(parrafo.textContent, 10);
+    numero++;
+    parrafo.textContent = numero;
+
+    let accion = "sumar";
+    crearFactura(tarjeta, numero, accion);
+}
+
 
 function cerrarHistorial(){
 
@@ -231,228 +268,78 @@ function mostrarFactura() {
     }
 }
 
-/* function generarFactura() {
-
-    let productos = []
-    let datos = new Object()
-
-    console.log("entre a generar factura")
-
-    let contenedor = document.querySelector("tbody")
-    let hijos = contenedor.children
-
-    let nombreUsuario = localStorage.getItem("nombre")
-
-
-    console.log("Contraseña: " + localStorage.getItem("contraseña"))
-
-
-    for (let i = 1; i < hijos.length; i++) {
-
-
-
-        console.log(hijos[i].children)
-
-        let fila = hijos[i].children
-
-        let nombre = fila[0].textContent
-        let cantidad = fila[1].textContent
-        let precio = fila[2].textContent
-
-        console.log("Nombre: " + nombre)
-        console.log("Cantidad: " + cantidad)
-        console.log("Precio: " + precio)
-
-        
-
-
-
-        datos = {
-            nombreProducto: nombre,
-            cantidadProducto: Number(cantidad),
-            valorUnidad: precio / cantidad,
-            precioTotal: Number(precio)
-
-        }
-
-        productos.push(datos)
-
-        datos = {}
-
-
-    }
-
-    console.log(productos)
-
-    if(productos.length == 0){
-        return
-    }
-
-    fetch("../usuarios.json")
-
-        .then(data => data.json())
-        .then(json => {
-
-
-            json.usuarios.forEach(usuario => {
-
-                if (usuario.nombre === nombreUsuario) {
-
-                    let tamaño = json.facturas.length
-                    let caracterTamaño = tamaño.toString()
-
-                    let ident = usuario.id
-
-                    let caracterIdent = ident.toString()
-                    let nombre = usuario.nombre
-
-                    enviar(caracterTamaño, caracterIdent, nombre, productos)
-
-
-                }
-
-
-            })
-        })
-
-} */
-
-function enviar(caracterTamaño, caracterIdent, nombre, productos) {
-
-    fetch(`http://localhost:3000/facturas/`, {
-        method: "POST",
-        headers: {
-            "Content-type": "application/json; charset=UTF-8"
-        },
-        body: JSON.stringify({
-
-            id: caracterIdent,
-            idFactura: caracterTamaño,
-            comprador: nombre,
-            datalles: productos,
-
-
-        })
-    })
-        .then(response => response.json())
-        .then(json => console.log(json))
-        .catch(error => console.error("Error !!!" + error));
-}
-
 function crearFactura(tarjeta, cantidad, accion) {
-
-    console.log(accion)
     let contenedor = document.querySelector(".facturaActual");
     let tabla = document.querySelector("table");
 
-    let hijos = tarjeta.children;
-    let padre = hijos[0];
-    let parrafo = padre.children;
-    let nombreProducto = parrafo[0].textContent;
-    let tbody = document.querySelector("tbody")
-
-    let casillaValorTotal = document.getElementById("valorTotalCasilla")
+    let nombreProducto = tarjeta.children[0].children[0].textContent;
+    let casillaValorTotal = document.getElementById("valorTotalCasilla");
 
     fetch("productos.json")
         .then(data => data.json())
         .then(json => {
+            let producto = json.productos.find(p => p.nombre === nombreProducto);
+            if (!producto) return;
+
+            let id = producto.id;
+            let precio = producto.precio;
+
+            let fila = document.getElementById(id);
 
             if (accion === "sumar") {
-                //tbody.style.visibility = "visible"
-                json.productos.forEach(producto => {
+                if (!fila) {
+                    // No existe aún, crear fila
+                    fila = tabla.insertRow();
+                    fila.setAttribute("id", id);
 
-                    if (producto.nombre == nombreProducto) {
+                    let celdaNombre = fila.insertCell(0);
+                    let celdaCantidad = fila.insertCell(1);
+                    let celdaPrecio = fila.insertCell(2);
 
-                        let id = producto.id
+                    celdaNombre.textContent = producto.nombre;
+                    celdaCantidad.textContent = 1;
+                    celdaPrecio.textContent = precio;
 
-                        if (ids.includes(id) == false) {
+                    contenedor.prepend(tabla);
+                    ids.push(id);
+                } else {
+                    // Ya existe, aumentar cantidad
+                    let celdaCantidad = fila.children[1];
+                    let celdaPrecio = fila.children[2];
 
-                            let codigo = producto.id;
-                            let nombre = producto.nombre;
-                            let precio = producto.precio;
+                    let nuevaCantidad = parseInt(celdaCantidad.textContent) + 1;
+                    celdaCantidad.textContent = nuevaCantidad;
+                    celdaPrecio.textContent = (nuevaCantidad * precio).toFixed(2);
+                }
 
+                valorTotal += precio;
+                casillaValorTotal.textContent = valorTotal.toFixed(2);
 
-                            let fila = tabla.insertRow();
+            } else if (accion === "restar" && fila) {
+                let celdaCantidad = fila.children[1];
+                let celdaPrecio = fila.children[2];
 
-                            let celdaNombre = fila.insertCell(0);
-                            let celdaCantidad = fila.insertCell(1);
-                            let celdaPrecio = fila.insertCell(2);
+                let nuevaCantidad = parseInt(celdaCantidad.textContent) - 1;
 
+                if (nuevaCantidad <= 0) {
+                    fila.remove();
+                    ids = ids.filter(item => item !== id);
+                } else {
+                    celdaCantidad.textContent = nuevaCantidad;
+                    celdaPrecio.textContent = (nuevaCantidad * precio).toFixed(2);
+                }
 
-                            celdaNombre.textContent = nombre;
-                            celdaPrecio.textContent = precio * cantidad;
-                            celdaCantidad.textContent = cantidad;
-
-                            valorTotal += precio
-                            casillaValorTotal.textContent = valorTotal
-
-                            fila.setAttribute("id", codigo)
-                            contenedor.prepend(tabla);
-                            console.log("No esta en el arreglo")
-                            ids.push(id)
-
-                        } else {
-                            let precio = producto.precio;
-                            let fila = document.getElementById(id)
-                            let casillaPrecio = fila.children[2]
-                            let cant = fila.children[1]
-
-                            let nuevoPrecio = precio * cantidad;
-
-                            casillaPrecio.textContent = nuevoPrecio;
-
-                            cant.textContent = cantidad
-
-                            valorTotal += precio
-                            casillaValorTotal.textContent = valorTotal
-                        }
-
-                    }
-
-
-                })
-
-            } else if (accion == "restar") {
-                json.productos.forEach(producto => {
-                    let tbody = document.querySelector("tbody")
-                    if (producto.nombre == nombreProducto) {
-
-                        let id = producto.id
-
-
-                        let precio = producto.precio;
-                        let fila = document.getElementById(id)
-                        let casillaPrecio = fila.children[2]
-                        let cant = fila.children[1]
-
-                        let nuevoPrecio = parseFloat(precio) * (cantidad);
-
-                        casillaPrecio.textContent = nuevoPrecio;
-
-                        cant.textContent = cantidad
-
-                        valorTotal -= precio
-                        casillaValorTotal.textContent = valorTotal
-
-                        if (cant.textContent == "0") {
-                            fila.remove()
-                            ids = ids.filter(item => item !== id);
-                        }
-
-
-
-
-                    }
-
-
-                })
-
-
+                valorTotal -= precio;
+                if (valorTotal < 0) valorTotal = 0;
+                casillaValorTotal.textContent = valorTotal.toFixed(2);
             }
-
-        })
-
+        });
 }
+
+
+
+
+
 
 function filtrar(contenido) {
     console.log("entre a filtrar con : " + contenido)
@@ -602,47 +489,7 @@ function insertarProductos() {
 
 }
 
-function restar(boton) {
 
-    let tarjeta = boton.parentElement.parentElement.parentElement;
-
-    let seccionBotonOrdenar = boton.parentElement.parentElement;
-    let hijosSeccionBotonOrdenar = seccionBotonOrdenar.children
-    let botonOrdenar = hijosSeccionBotonOrdenar[0]
-
-    let padre = boton.parentElement;
-    let hijos = padre.children;
-    let parrafo = hijos[1];
-
-    let numero = parseInt(parrafo.textContent, 10); // Asegúrase de convertir el texto a un número
-    let accion = "restar"
-
-    if (numero == 0) {
-        padre.remove();
-        numero = 0
-        botonOrdenar.style.display = "block"
-
-    } else {
-        parrafo.textContent = --numero;
-        crearFactura(tarjeta, numero, accion)
-    }
-}
-
-
-function sumar(boton) {
-    let tarjeta = boton.parentElement.parentElement.parentElement;
-    //console.log(tarjeta)
-    //console.log(boton);
-    let padre = boton.parentElement;
-    //console.log(padre);
-
-    let hijos = padre.children;
-    let parrafo = hijos[1]
-    let cantidad = parrafo.textContent = ++numero
-    let accion = "sumar"
-
-    crearFactura(tarjeta, cantidad, accion)
-}
 
 
 function identificar(boton) {
@@ -736,6 +583,270 @@ function mostrarAlertaBonita(mensaje, colorFondo = "#4CAF50") {
 }
 
 
+function enviar(caracterTamaño, caracterIdent, nombre, productos) {
 
-insertarProductos()
+    fetch(`http://localhost:3000/facturas/`, {
+        method: "POST",
+        headers: {
+            "Content-type": "application/json; charset=UTF-8"
+        },
+        body: JSON.stringify({
+
+            id: caracterIdent,
+            idFactura: caracterTamaño,
+            comprador: nombre,
+            datalles: productos,
+
+
+        })
+    })
+        .then(response => response.json())
+        .then(json => console.log(json))
+        .catch(error => console.error("Error !!!" + error));
+}
+
+/* function generarFactura() {
+
+    let productos = []
+    let datos = new Object()
+
+    console.log("entre a generar factura")
+
+    let contenedor = document.querySelector("tbody")
+    let hijos = contenedor.children
+
+    let nombreUsuario = localStorage.getItem("nombre")
+
+
+    console.log("Contraseña: " + localStorage.getItem("contraseña"))
+
+
+    for (let i = 1; i < hijos.length; i++) {
+
+
+
+        console.log(hijos[i].children)
+
+        let fila = hijos[i].children
+
+        let nombre = fila[0].textContent
+        let cantidad = fila[1].textContent
+        let precio = fila[2].textContent
+
+        console.log("Nombre: " + nombre)
+        console.log("Cantidad: " + cantidad)
+        console.log("Precio: " + precio)
+
+        
+
+
+
+        datos = {
+            nombreProducto: nombre,
+            cantidadProducto: Number(cantidad),
+            valorUnidad: precio / cantidad,
+            precioTotal: Number(precio)
+
+        }
+
+        productos.push(datos)
+
+        datos = {}
+
+
+    }
+
+    console.log(productos)
+
+    if(productos.length == 0){
+        return
+    }
+
+    fetch("../usuarios.json")
+
+        .then(data => data.json())
+        .then(json => {
+
+
+            json.usuarios.forEach(usuario => {
+
+                if (usuario.nombre === nombreUsuario) {
+
+                    let tamaño = json.facturas.length
+                    let caracterTamaño = tamaño.toString()
+
+                    let ident = usuario.id
+
+                    let caracterIdent = ident.toString()
+                    let nombre = usuario.nombre
+
+                    enviar(caracterTamaño, caracterIdent, nombre, productos)
+
+
+                }
+
+
+            })
+        })
+
+} */
+
+/* function crearFactura(tarjeta, cantidad, accion) {
+
+    console.log(accion)
+    let contenedor = document.querySelector(".facturaActual");
+    let tabla = document.querySelector("table");
+
+    let hijos = tarjeta.children;
+    let padre = hijos[0];
+    let parrafo = padre.children;
+    let nombreProducto = parrafo[0].textContent;
+    let tbody = document.querySelector("tbody")
+
+    let casillaValorTotal = document.getElementById("valorTotalCasilla")
+
+    fetch("productos.json")
+        .then(data => data.json())
+        .then(json => {
+
+            if (accion === "sumar") {
+                //tbody.style.visibility = "visible"
+                json.productos.forEach(producto => {
+
+                    if (producto.nombre == nombreProducto) {
+
+                        let id = producto.id
+
+                        if (ids.includes(id) == false) {
+
+                            let codigo = producto.id;
+                            let nombre = producto.nombre;
+                            let precio = producto.precio;
+
+
+                            let fila = tabla.insertRow();
+
+                            let celdaNombre = fila.insertCell(0);
+                            let celdaCantidad = fila.insertCell(1);
+                            let celdaPrecio = fila.insertCell(2);
+
+
+                            celdaNombre.textContent = nombre;
+                            celdaPrecio.textContent = precio * cantidad;
+                            celdaCantidad.textContent = cantidad;
+
+                            valorTotal += precio
+                            casillaValorTotal.textContent = valorTotal
+
+                            fila.setAttribute("id", codigo)
+                            contenedor.prepend(tabla);
+                            console.log("No esta en el arreglo")
+                            ids.push(id)
+
+                        } else {
+                            let precio = producto.precio;
+                            let fila = document.getElementById(id)
+                            let casillaPrecio = fila.children[2]
+                            let cant = fila.children[1]
+
+                            let nuevoPrecio = precio * cantidad;
+
+                            casillaPrecio.textContent = nuevoPrecio;
+
+                            cant.textContent = cantidad
+
+                            valorTotal += precio
+                            casillaValorTotal.textContent = valorTotal
+                        }
+
+                    }
+
+
+                })
+
+            } else if (accion == "restar") {
+                json.productos.forEach(producto => {
+                    let tbody = document.querySelector("tbody")
+                    if (producto.nombre == nombreProducto) {
+
+                        let id = producto.id
+
+
+                        let precio = producto.precio;
+                        let fila = document.getElementById(id)
+                        let casillaPrecio = fila.children[2]
+                        let cant = fila.children[1]
+
+                        let nuevoPrecio = parseFloat(precio) * (cantidad);
+
+                        casillaPrecio.textContent = nuevoPrecio;
+
+                        cant.textContent = cantidad
+
+                        valorTotal -= precio
+                        casillaValorTotal.textContent = valorTotal
+
+                        if (cant.textContent == "0") {
+                            fila.remove()
+                            ids = ids.filter(item => item !== id);
+                        }
+
+
+
+
+                    }
+
+
+                })
+
+
+            }
+
+        })
+
+} */
+
+        
+/* function restar(boton) {
+
+    let tarjeta = boton.parentElement.parentElement.parentElement;
+
+    let seccionBotonOrdenar = boton.parentElement.parentElement;
+    let hijosSeccionBotonOrdenar = seccionBotonOrdenar.children
+    let botonOrdenar = hijosSeccionBotonOrdenar[0]
+
+    let padre = boton.parentElement;
+    let hijos = padre.children;
+    let parrafo = hijos[1];
+
+    let numero = parseInt(parrafo.textContent, 10); // Asegúrase de convertir el texto a un número
+    let accion = "restar"
+
+    if (numero == 0) {
+        padre.remove();
+        numero = 0
+        botonOrdenar.style.display = "block"
+
+    } else {
+        parrafo.textContent = --numero;
+        crearFactura(tarjeta, numero, accion)
+    }
+}
+
+
+function sumar(boton) {
+    let tarjeta = boton.parentElement.parentElement.parentElement;
+    //console.log(tarjeta)
+    //console.log(boton);
+    let padre = boton.parentElement;
+    //console.log(padre);
+
+    let hijos = padre.children;
+    let parrafo = hijos[1]
+    let cantidad = parrafo.textContent = ++numero
+    let accion = "sumar"
+
+    crearFactura(tarjeta, cantidad, accion)
+} */
+        insertarProductos()
 
