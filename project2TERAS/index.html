@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Paga tus facturas online</title>
+    <link rel="shortcut icon" href="./img/logo.png" type="image/x-icon"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css"/>
+    <link rel="stylesheet" href="styles.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css"/>
+    <link rel="stylesheet" href="css/alert.css">
+</head>
+<body>
+    <!--ENCABEZADO-->
+    <nav class="navbar color" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+        <a class="navbar-item" href="./main.html"><img src="./img/logo.png" /></a>
+        <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        </a>
+    </div>
+    <div id="navbarBasicExample" class="navbar-menu"></div>
+    </nav>
+    <!--CARTAS-->
+    <section class="section">
+    <div class="container">
+        <div class="columns">
+        <!--CARTA1-->
+        <div class="column">
+            <div class="card">
+            <div class="card-image">
+                <figure class="image is-4by3">
+                <img src="./img/gas.jpg" alt="Placeholder image" />
+                </figure>
+            </div>
+            <div class="card-content">
+                <div class="media">
+                <div class="media-left">
+                    <figure class="image is-48x48">
+                    <img src="./img/logogas.png" alt="Placeholder image"/>
+                    </figure>
+                </div>
+                <div class="media-content">
+                    <p class="title is-4">Servicio de gas</p>
+                </div>
+                </div>
+                <div class="content">
+                <time datetime="2016-1-1">Alcanos-Promigas-Vanti</time>
+                </div>
+            </div>
+            </div>
+        </div>
+        <!--CARTA1-->
+        <!--CARTA2-->
+        <div class="column">
+            <div class="card">
+            <div class="card-image">
+                <figure class="image is-4by3">
+                <img src="./img/agua.jpg" alt="Placeholder image" />
+                </figure>
+            </div>
+            <div class="card-content">
+                <div class="media">
+                <div class="media-left">
+                    <figure class="image is-48x48">
+                    <img src="./img/logoagua.png" alt="Placeholder image"/>
+                    </figure>
+                </div>
+                <div class="media-content">
+                    <p class="title is-4">Servicio de agua</p>
+                </div>
+                </div>
+
+                <div class="content">
+                <time datetime="2016-1-1">Metropolitano-amb</time>
+                </div>
+            </div>
+            </div>
+        </div>
+        <!--CARTA2-->
+        <!--CARTA3-->
+        <div class="column">
+            <div class="card">
+            <div class="card-image">
+                <figure class="image is-4by3">
+                <img src="./img/luz.jpg" alt="Placeholder image" />
+                </figure>
+            </div>
+            <div class="card-content">
+                <div class="media">
+                <div class="media-left">
+                    <figure class="image is-48x48">
+                    <img src="./img/logoluz.png" alt="Placeholder image"/>
+                    </figure>
+                </div>
+                <div class="media-content">
+                    <p class="title is-4">Servicio de luz</p>
+                </div>
+                </div>
+
+                <div class="content">
+                <time datetime="2016-1-1">ESSA</time>
+                </div>
+            </div>
+            </div>
+        </div>
+        </div>
+    </div>
+    </section>
+    <br>
+    <br>
+    <!--BANER-->
+    <section class="section is-medium back" style="padding-right: 20%;">
+    <h1 class="title blanco">Paga tus servicios en linea</h1>
+    <h2 class="subtitle blanco">
+        Con solo el numero de referencia de tu factura podras pagar con un click
+        todas tus facturas.
+    </h2>
+    <button class="js-modal-trigger button is-large is-link prueba" data-target="modal-js-example">
+        <span class="icon is-medium">
+        <i class="fa fa-globe"></i>
+        </span>
+        <span>CONSULTAR</span>
+    </button>
+    </section>
+
+    <script type="module" src="js/index.js"></script>
+
+    <!--MODAL1-->
+
+    <div id="modal-js-example" class="modal">
+    <div class="modal-background"></div>
+    <div class="modal-content">
+        <div class="box">
+        <button class="button is-success modal-close ajustarUbicacion1" style="padding: 15px;" aria-label="close" id="cerrarConsulta"></button>
+        <p class="title is-3">Consulta tu factura</p>
+        <!---->
+        <div class="field">
+
+            <label class="label">Tipo de servicio:</label>
+            <div class="control">
+            <div class="select">
+                <select id="tipoServicio">
+                <option selected="true" disabled="disabled">Tipo Servicio</option>
+                <option value="Agua">Agua</option>
+                <option value="Luz">Luz</option>
+                <option value="Gas">Gas</option>
+                </select>
+            </div>
+            </div>
+
+        </div>
+        <!---->
+        <div class="field">
+            <label class="label">Empresa:</label>
+            <div class="control">
+            <div class="select">
+                <select id="seccionProveedores" >
+                    
+                </select>
+            </div>
+            </div>
+        </div>
+        <!---->
+        <div class="field">
+            <label class="label">Numero de factura:</label>
+            <div class="control has-icons-left has-icons-right">
+            <input
+                id="codigoFactura"
+                class="input is-danger"
+                type="text"
+
+                placeholder="Ingrese el codigo de la factura"
+                value=""
+
+            />
+            <span class="icon is-small is-left">
+                <i class="fa fa-file" aria-hidden="true"></i>
+            </span>
+            <span class="icon is-small is-right" >
+                <i class="fas fa-exclamation-triangle" id="iconoFactura"></i>
+            </span>
+            </div>
+            <p class="help is-danger" id="parraFactura">Numero de referencia invalido(recuerde que no puede estar vacio o con espacios).</p>
+        </div>
+        <!---->
+        <div class="field is-grouped">
+            <div class="control">
+
+            <button class="button is-success" id="botonConsultar" disabled>Consultar</button>
+
+
+            </div>
+        </div>
+        </div>
+           <!--PROBANDO CARTA DENTRO DE UN MISMO MODAL-->
+           <div class="box facturaCard probando">
+            <button class="button is-danger ajustarUbicacion2" id="cerrarDatosFactura" style="padding: 10px; border-radius: 25px; height: 30px;" aria-label="close">X</button>
+            <p class="title is-3">Datos de la factura</p>
+            <hr>
+            <div class="tile is-ancestor">
+                <div class="tile is-vertical is-8">
+                <div class="tile">
+                    <div class="tile is-parent is-vertical">
+                    <article class="tile is-child box">
+                       
+
+
+                        <div class="numeroFactura">
+                            <strong><i class="fa-solid fa-hashtag"></i>  Numero de la factura: </strong>
+                            <br>
+
+                            <span id="numeroFactura"></span>
+                        </div>
+
+                    </article>
+                    <article class="tile is-child box">
+                        
+
+
+                        <div> <strong> <i class="fa-solid fa-calendar-days"></i> Periodo facturado: </strong>
+
+                        
+                      
+                            <br>
+
+                            <span id="periodoFacturado"></span>
+                        </div>
+
+                    </article>
+                    </div>
+                    <div class="tile is-parent">
+                    <article class="tile is-child box" >
+                            <strong>Proveedor</strong>
+
+                            <div id="logoEmpresa">
+
+                            </div>
+
+                    </article>
+                    </div>
+                </div>
+                <div class="tile is-parent">
+                    <article class="tile is-child box">
+              
+
+                    <div class="totalPagar"><strong><i class="fa fa-credit-card" aria-hidden="true"></i>  Total a pagar: </strong> <span id="totalPagar"></span></div>
+
+                    </article>
+
+                </div>
+                </div>
+
+                <div class="tile is-parent is-vertical">
+                    <article class="tile is-child box">
+
+                        <div id="divDireccionDomicilio"><strong><i class="fa-solid fa-location-dot"></i>  Direccion del domocilio: </strong><br> <span id="direccionDomicilio"></span></div>
+                    </article>
+                    <article class="tile is-child box">
+                        <div id="estado"> <strong> <i class="fa-solid fa-chart-simple"></i> Estado Factura: </strong> <span id="estadoFactura"></span></div>
+                    </article>
+
+                </div>
+                
+            </div>
+            <section class="section intoo">
+                <div class="container ">
+
+                    <button class="button is-danger" id="botonPagar" disabled>PAGAR</button>
+
+                </div>
+            </section>
+            </div>   
+        </div>
+    
+    </div>
+
+    <!--FOOTER-->
+    <footer class="footer">
+        <div class="content has-text-centered">
+        <p>
+            <strong>2Teras</strong> by <a href="https://github.com/HaderCabrera/2teras.git"> HaderCabrera, DiegoPerez, Rolo</a>. El codigo fuente esta bajo la licencia
+            <a href="http://opensource.org/licenses/mit-license.php">CAMPUSLANDS</a>. El contenido esta bajo la licencia de <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Los dioses</a>.
+        </p>
+        </div>
+    </footer>
+
+    
+    <div class="custom-alert" id="customAlert">
+        <h2>¡Factura pagada exitosamente</h2>
+        <button class="close-btn" id="botonOk" onclick="hideCustomAlert()">ok</button>
+    </div>
+    
+    <script src="./hader.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+    <script src="https://kit.fontawesome.com/6e6e65d397.js" crossorigin="anonymous"></script>
+</body>
+</html>
